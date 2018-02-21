@@ -20,24 +20,6 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_color (ima
     [albedoB, normalB, pB, qB, SEB, height_mapB] = photometric_stereo_single(image_dir, 3, shadow_trick, threshold, surface_type);
     [h, w, d] = size(normalR);
     
-    %% Display
-    % show results
-    if ~all(isnan(albedoR))
-        disp('Red channel')
-        show_results(albedoR, normalR, SER);
-        show_model(albedoR, height_mapR);
-    end
-    if ~all(isnan(albedoG))
-        disp('Green channel')
-        show_results(albedoG, normalG, SEG);
-        show_model(albedoG, height_mapG);
-    end
-    if ~all(isnan(albedoB))
-        disp('Blue channel')
-        show_results(albedoB, normalB, SEB);
-        show_model(albedoB, height_mapB);
-    end
-
     %% combination code
     
     % combine albedos. apparantly, the show_model doesn't want to display
@@ -69,6 +51,7 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_color (ima
     height_map = construct_surface(p, q, surface_type);
     
     % show the results
-    show_results(albedos, normed, SE);
-    show_model(albedos, height_map);
+    [~, name, ~] = fileparts(image_dir)
+    show_results(albedos, normed, SE, sprintf('plots/colored-folder=%s-shadow=%d-thres=%f-surface=%s-combined_shadow=%d-results.png', name, shadow_trick, threshold, surface_type, combine_shadow_trick));
+    show_model(albedos, height_map, sprintf('plots/colored-folder=%s-shadow=%d-thres=%f-surface=%s-combined_shadow=%d-model.png', name, shadow_trick, threshold, surface_type, combine_shadow_trick));
 end

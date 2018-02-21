@@ -1,4 +1,4 @@
-function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (image_dir, channel, shadow_trick, threshold, surface_type, show)
+function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (image_dir, channel, shadow_trick, threshold, surface_type)
     % some default arguments
     if nargin < 2 
         channel = 1;
@@ -11,9 +11,6 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
     end
     if nargin < 5
         surface_type = 'column';
-    end
-    if nargin < 6
-        show = false;
     end
     
     %% load the images
@@ -35,12 +32,8 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
     %% compute the surface height
     height_map = construct_surface(p, q, surface_type);
     
-    % we're done if not showing
-    if ~show
-        return
-    end
-    
     %% Display
-    show_results(albedo, normals, SE);
-    show_model(albedo, height_map);
+    [~, name, ~] = fileparts(image_dir)
+    show_results(albedo, normals, SE, sprintf('plots/folder=%s-%d-shadow=%d-thres=%f-surface=%s-results.png', name, channel, shadow_trick, threshold, surface_type));
+    show_model(albedo, height_map, sprintf('plots/folder=%s-%d-shadow=%d-thres=%f-surface=%s-model.png', name, channel, shadow_trick, threshold, surface_type));
 end

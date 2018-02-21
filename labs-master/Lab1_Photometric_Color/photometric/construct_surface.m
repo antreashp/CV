@@ -5,10 +5,12 @@ function [ height_map ] = construct_surface(p, q, path_type)
     %   path_type: type of path to construct height_map, either 'column',
     %   'row', or 'average'
     %   height_map: the reconstructed surface
-
     if nargin == 2
         path_type = 'column';
     end
+    
+    % default to zeros
+    height_map = zeros(size(p));
 
     % check the path type
     switch path_type
@@ -18,6 +20,8 @@ function [ height_map ] = construct_surface(p, q, path_type)
             height_map = row_wise(p, q);
         case 'average'
             height_map = column_wise(p, q) + row_wise(p, q);
+        otherwise
+            error('Unsupported type')
     end
 end
 

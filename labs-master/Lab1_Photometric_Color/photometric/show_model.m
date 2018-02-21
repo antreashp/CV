@@ -1,4 +1,4 @@
-function show_model(albedo, height_map)
+function show_model(albedo, height_map, filename)
 % SHOW_MODEL: display the model with texture
 %   albedo: image used as texture for the model
 %   height_map: height in z direction, describing the model geometry
@@ -25,5 +25,10 @@ set(gca, 'XDir', 'reverse')
 set(gca, 'XTick', []);
 set(gca, 'YTick', []);
 set(gca, 'ZTick', []);
+
+if nargin > 2
+    saveas(gcf, filename)
+end
+
 end
 
