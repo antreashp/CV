@@ -7,7 +7,7 @@ function [ height_map ] = construct_surface(p, q, path_type)
     %   height_map: the reconstructed surface
 
     if nargin == 2
-        path_type = 'row';
+        path_type = 'column';
     end
 
     % check the path type
