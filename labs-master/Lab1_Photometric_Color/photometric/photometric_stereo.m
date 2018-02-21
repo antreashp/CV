@@ -19,5 +19,5 @@ clc;
 
 % run the color models for the monkey
 %photometric_stereo_color('./MonkeyColor', false, 0.005);
-photometric_stereo_color('./MonkeyColor', true, 0.005);
+photometric_stereo_color('./MonkeyColor', true, 0.005, 'average');
 %photometric_stereo_color('./MonkeyColor', true, 0.005, false);

@@ -1,4 +1,4 @@
-function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (image_dir, channel, shadow_trick, threshold, show)
+function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (image_dir, channel, shadow_trick, threshold, surface_type, show)
     % some default arguments
     if nargin < 2 
         channel = 1;
@@ -10,6 +10,9 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
         threshold = 0.005;
     end
     if nargin < 5
+        surface_type = 'column';
+    end
+    if nargin < 6
         show = false;
     end
     
@@ -30,7 +33,7 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
     fprintf('Number of outliers: %d\n\n', sum(sum(SE > threshold)));
     
     %% compute the surface height
-    height_map = construct_surface( p, q );
+    height_map = construct_surface(p, q, surface_type);
     
     % we're done if not showing
     if ~show

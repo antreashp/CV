@@ -1,4 +1,4 @@
-function [albedo, normals, p, q, SE, height_map] = photometric_stereo_color (image_dir, shadow_trick, threshold, combine_shadow_trick)
+function [albedo, normals, p, q, SE, height_map] = photometric_stereo_color (image_dir, shadow_trick, threshold, surface_type, combine_shadow_trick)
     % some default arguments
     if nargin < 2
         shadow_trick = false;
@@ -7,14 +7,17 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_color (ima
         threshold = 0.005;
     end
     if nargin < 4
+        surface_type = 'column';
+    end
+    if nargin < 5
         combine_shadow_trick = shadow_trick;
     end
     
     %% we run the photometric stereo single version for all channels
     % separately
-    [albedoR, normalR, pR, qR, SER, height_mapR] = photometric_stereo_single(image_dir, 1);
-    [albedoG, normalG, pG, qG, SEG, height_mapG] = photometric_stereo_single(image_dir, 2);
-    [albedoB, normalB, pB, qB, SEB, height_mapB] = photometric_stereo_single(image_dir, 3);
+    [albedoR, normalR, pR, qR, SER, height_mapR] = photometric_stereo_single(image_dir, 1, shadow_trick, threshold, surface_type);
+    [albedoG, normalG, pG, qG, SEG, height_mapG] = photometric_stereo_single(image_dir, 2, shadow_trick, threshold, surface_type);
+    [albedoB, normalB, pB, qB, SEB, height_mapB] = photometric_stereo_single(image_dir, 3, shadow_trick, threshold, surface_type);
     [h, w, d] = size(normalR);
     
     %% Display
@@ -63,7 +66,7 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_color (ima
     [p, q, SE] = check_integrability(normed);
     
     % construct a surface from the combined normals
-    height_map = construct_surface(p, q);
+    height_map = construct_surface(p, q, surface_type);
     
     % show the results
     show_results(albedos, normed, SE);
