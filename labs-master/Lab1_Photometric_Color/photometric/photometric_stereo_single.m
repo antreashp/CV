@@ -22,6 +22,7 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
     %% compute the surface gradient from the stack of imgs and light source mat
     disp('Computing surface albedo and normal map...');
     [albedo, normals] = estimate_alb_nrm(image_stack, scriptV, shadow_trick);
+    disp(sum(sum(isnan(normals))));
     
     %% integrability check: is (dp / dy  -  dq / dx) ^ 2 small everywhere?
     disp('Integrability checking');
@@ -33,7 +34,7 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
     height_map = construct_surface(p, q, surface_type);
     
     %% Display
-    [~, name, ~] = fileparts(image_dir)
+    [~, name, ~] = fileparts(image_dir);
     show_results(albedo, normals, SE, sprintf('plots/folder=%s-%d-shadow=%d-thres=%f-surface=%s-results.png', name, channel, shadow_trick, threshold, surface_type));
     show_model(albedo, height_map, sprintf('plots/folder=%s-%d-shadow=%d-thres=%f-surface=%s-model.png', name, channel, shadow_trick, threshold, surface_type));
 end

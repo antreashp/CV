@@ -51,7 +51,7 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_color (ima
     height_map = construct_surface(p, q, surface_type);
     
     % show the results
-    [~, name, ~] = fileparts(image_dir)
+    [~, name, ~] = fileparts(image_dir);
     show_results(albedos, normed, SE, sprintf('plots/colored-folder=%s-shadow=%d-thres=%f-surface=%s-combined_shadow=%d-results.png', name, shadow_trick, threshold, surface_type, combine_shadow_trick));
     show_model(albedos, height_map, sprintf('plots/colored-folder=%s-shadow=%d-thres=%f-surface=%s-combined_shadow=%d-model.png', name, shadow_trick, threshold, surface_type, combine_shadow_trick));
 end
