@@ -36,7 +36,7 @@ for x = 1:h
         if shadow_trick
             % we can stop if the rank is too small, it will never have a
             % proper result then
-            if rank(scriptI * scriptV) <= 2
+            if sum(i) == 0
                 continue
             end
             
