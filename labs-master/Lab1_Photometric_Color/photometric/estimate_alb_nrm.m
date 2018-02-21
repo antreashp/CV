@@ -7,53 +7,51 @@ function [ albedo, normal ] = estimate_alb_nrm( image_stack, scriptV, shadow_tri
 %   	linear equations
 %   albedo : the surface albedo
 %   normal : the surface normal
-
-% image_stack=image_stack;
-% disp(image_stack);
-[h, w, ~] = size(image_stack);
+[h, w, d] = size(image_stack);
 if nargin == 2
     shadow_trick = false;
 end
-% disp(image_stack(250,250,2,:));
+
 % create arrays for 
 %   albedo (1 channel)
 %   normal (3 channels)
 albedo = zeros(h, w, 1);
 normal = zeros(h, w, 3);
-% disp(scriptV);
-% scriptV=squeeze(scriptV);
-% disp(scriptV);
-% disp(scriptV.');
+
 % =========================================================================
 % YOUR CODE GOES HERE
+
 % for each point in the image array
-%   stack image values into a vector i
-%   construct the diagonal matrix scriptI
-%   solve scriptI * scriptV * g = scriptI * i to obtain g for this point
-%   albedo at this point is |g|
-%   normal at this point is g / |g|
-% imshow(image_stack(:,:,3));
-
-for i = 1:h
-    
-    for j = 1:w
-
-        pointVector= reshape(image_stack(i, j, :), [] ,1);  %reshape(image_stack(i,j,:),size(image_stack,3),1);
-
-        SI=diag(pointVector);%.*eye(5,5);
-
-        if sum(SI*pointVector)>0
-            g=[scriptV]\[pointVector];
-            meh=norm(g);
-            albedo(i,j)=meh;
- 
-            normal(i,j,:)=g/meh;
-
+for x = 1:h
+    for y = 1:w
+        % stack image values into a vector i
+        i = reshape(image_stack(x, y, :), [], 1);
+        
+        % construct the diagonal matrix scriptI
+        scriptI = diag(i); 
+        
+        % we want to solve Ag = B
+        % for the shadow trick, A = IV and B = Ii,
+        % otherwise A = V and B = i
+        if shadow_trick
+            % we can stop if the rank is too small, it will never have a
+            % proper result then
+            if rank(scriptI * scriptV) <= 2
+                continue
+            end
+            
+            g = (scriptI * scriptV) \ (scriptI * i);
+        else
+            g = scriptV \ i;
         end
+            
+        % albedo at this point is |g|
+        albedo(x,y) = norm(g);
+            
+        % normal at this point is g / |g|
+        normal(x,y,:) = g / albedo(x,y);
     end
 end
-
-
 % =========================================================================
 
 end
