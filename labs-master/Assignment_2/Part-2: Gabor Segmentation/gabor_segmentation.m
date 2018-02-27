@@ -10,7 +10,7 @@ err_msg  = 'Image not available.';
 
 % Control settings
 visFlag       = false;    %  Set to true to visualize filter responses.
-smoothingFlag = true;   %  Set to true to postprocess filter outputs.
+smoothingFlag = false;   %  Set to true to postprocess filter outputs.
 
 %% Read image
 switch image_id
@@ -133,8 +133,10 @@ fprintf('--------------------------------------\n')
 %            explain what works better and why shortly in the report.
 featureMaps = cell(length(gaborFilterBank),1);
 for jj = 1 : length(gaborFilterBank)
-    real_out =  % \\TODO: filter the grayscale input with real part of the Gabor
-    imag_out =  % \\TODO: filter the grayscale input with imaginary part of the Gabor
+    % create the gabor and get their segments
+    gabor = gaborFilterBank(jj).filterPairs;
+    real_out = conv2(img_gray, gabor(:,:,1), 'same');
+    imag_out = conv2(img_gray, gabor(:,:,2), 'same');
     featureMaps{jj} = cat(3, real_out, imag_out);
     
     % Visualize the filter responses if you wish.
@@ -158,7 +160,7 @@ featureMags =  cell(length(gaborFilterBank),1);
 for jj = 1:length(featureMaps)
     real_part = featureMaps{jj}(:,:,1);
     imag_part = featureMaps{jj}(:,:,2);
-    featureMags{jj} = % \\TODO: Compute the magnitude here
+    featureMags{jj} = sqrt(real_part.^2 + imag_part.^2);
     
     % Visualize the magnitude response if you wish.
     if visFlag
@@ -183,11 +185,12 @@ end
 % \\ Hint: doc imfilter, doc fspecial or doc imgaussfilt.  
 features = zeros(numRows, numCols, length(featureMags));
 if smoothingFlag
-    % \\TODO:
-    %FOR_LOOP
+    % smooth it
+    for jj = 1:length(featureMags)
         % i)  filter the magnitude response with appropriate Gaussian kernels
         % ii) insert the smoothed image into features(:,:,jj)
-    %END_FOR
+        features(:,:,jj) = conv2(featureMags{jj}, fspecial('gaussian', 5, 0.5), 'same');
+    end
 else
     % Don't smooth but just insert magnitude images into the matrix
     % called features.
@@ -207,10 +210,10 @@ features = reshape(features, numRows * numCols, []);
 % Standardize features. 
 % \\ Hint: see http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing
 %          for more information. \\
-
-features = % \\ TODO: i)  Implement standardization on matrix called features. 
-           %          ii) Return the standardized data matrix.
-
+% i)  Implement standardization on matrix called features. 
+features = (features - mean(features));
+% ii) Return the standardized data matrix.
+features = features / std(features);
 
 % (Optional) Visualize the saliency map using the first principal component 
 % of the features matrix. It will be useful to diagnose possible problems 
@@ -227,10 +230,9 @@ imshow(feature2DImage,[]), title('Pixel representation projected onto first PC')
 % \\ Hint-2: use the parameter k defined in the first section when calling
 %            MATLAB's built-in kmeans function.
 tic
-pixLabels = % \\TODO: Return cluster labels per pixel
+pixLabels = kmeans(features, k); 
 ctime = toc;
 fprintf('Clustering completed in %.3f seconds.\n', ctime);
-
 
 
 % Visualize the clustering by reshaping pixLabels into original grayscale
@@ -239,8 +241,6 @@ pixLabels = reshape(pixLabels,[numRows numCols]);
 
 figure(5)
 imshow(label2rgb(pixLabels)), title('Pixel clusters');
-
-
 
 % Use the pixLabels to visualize segmentation.
 Aseg1 = zeros(size(img),'like',img);
