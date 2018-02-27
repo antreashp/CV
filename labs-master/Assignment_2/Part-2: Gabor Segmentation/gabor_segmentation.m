@@ -1,7 +1,7 @@
 %% Hyperparameters
 k        = 2;      % number of clusters in k-means algorithm. By default, 
                    % we consider k to be 2 in foreground-background segmentation task.
-image_id = 'Kobi'; % Identifier to switch between input images.
+image_id = 'Robin-1'; % Identifier to switch between input images.
                    % Possible ids: 'Kobi',    'Polar', 'Robin-1'
                    %               'Robin-2', 'Cows'
 
@@ -10,7 +10,7 @@ err_msg  = 'Image not available.';
 
 % Control settings
 visFlag       = false;    %  Set to true to visualize filter responses.
-smoothingFlag = false;   %  Set to true to postprocess filter outputs.
+smoothingFlag = true;   %  Set to true to postprocess filter outputs.
 
 %% Read image
 switch image_id
@@ -40,7 +40,7 @@ end
 
 % Image adjustments
 img      = imresize(img,resize_factor);
-img_gray = rgb2gray(img);
+img_gray = im2double(rgb2gray(img));
 
 % Display image
 figure(1), imshow(img), title(sprintf('Input image: %s', image_id));
@@ -135,8 +135,8 @@ featureMaps = cell(length(gaborFilterBank),1);
 for jj = 1 : length(gaborFilterBank)
     % create the gabor and get their segments
     gabor = gaborFilterBank(jj).filterPairs;
-    real_out = conv2(img_gray, gabor(:,:,1), 'same');
-    imag_out = conv2(img_gray, gabor(:,:,2), 'same');
+    real_out = imfilter(img_gray, gabor(:,:,1), 'replicate');
+    imag_out = imfilter(img_gray, gabor(:,:,2), 'replicate');
     featureMaps{jj} = cat(3, real_out, imag_out);
     
     % Visualize the filter responses if you wish.
@@ -160,7 +160,7 @@ featureMags =  cell(length(gaborFilterBank),1);
 for jj = 1:length(featureMaps)
     real_part = featureMaps{jj}(:,:,1);
     imag_part = featureMaps{jj}(:,:,2);
-    featureMags{jj} = sqrt(real_part.^2 + imag_part.^2);
+    featureMags{jj} = (real_part.^2 + imag_part.^2).^(1/2);
     
     % Visualize the magnitude response if you wish.
     if visFlag
@@ -189,7 +189,7 @@ if smoothingFlag
     for jj = 1:length(featureMags)
         % i)  filter the magnitude response with appropriate Gaussian kernels
         % ii) insert the smoothed image into features(:,:,jj)
-        features(:,:,jj) = conv2(featureMags{jj}, fspecial('gaussian', 5, 0.5), 'same');
+        features(:,:,jj) = imfilter(featureMags{jj}, fspecial('gaussian', 5, 0.5));
     end
 else
     % Don't smooth but just insert magnitude images into the matrix
