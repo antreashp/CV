@@ -1,4 +1,4 @@
-function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (image_dir, channel, shadow_trick, threshold, show)
+function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (image_dir, channel, shadow_trick, threshold, surface_type)
     % some default arguments
     if nargin < 2 
         channel = 1;
@@ -10,7 +10,7 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
         threshold = 0.005;
     end
     if nargin < 5
-        show = false;
+        surface_type = 'column';
     end
     
     %% load the images
@@ -22,6 +22,7 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
     %% compute the surface gradient from the stack of imgs and light source mat
     disp('Computing surface albedo and normal map...');
     [albedo, normals] = estimate_alb_nrm(image_stack, scriptV, shadow_trick);
+    disp(sum(sum(isnan(normals))));
     
     %% integrability check: is (dp / dy  -  dq / dx) ^ 2 small everywhere?
     disp('Integrability checking');
@@ -30,14 +31,10 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_single (im
     fprintf('Number of outliers: %d\n\n', sum(sum(SE > threshold)));
     
     %% compute the surface height
-    height_map = construct_surface( p, q );
-    
-    % we're done if not showing
-    if ~show
-        return
-    end
+    height_map = construct_surface(p, q, surface_type);
     
     %% Display
-    show_results(albedo, normals, SE);
-    show_model(albedo, height_map);
+    [~, name, ~] = fileparts(image_dir);
+    show_results(albedo, normals, SE, sprintf('plots/folder=%s-%d-shadow=%d-thres=%f-surface=%s-results.png', name, channel, shadow_trick, threshold, surface_type));
+    show_model(albedo, height_map, sprintf('plots/folder=%s-%d-shadow=%d-thres=%f-surface=%s-model.png', name, channel, shadow_trick, threshold, surface_type));
 end
