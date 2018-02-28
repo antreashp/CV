@@ -1,7 +1,7 @@
 %% Hyperparameters
 k        = 2;      % number of clusters in k-means algorithm. By default, 
                    % we consider k to be 2 in foreground-background segmentation task.
-image_id = 'Robin-1'; % Identifier to switch between input images.
+image_id = 'Cows'; % Identifier to switch between input images.
                    % Possible ids: 'Kobi',    'Polar', 'Robin-1'
                    %               'Robin-2', 'Cows'
 
@@ -9,8 +9,9 @@ image_id = 'Robin-1'; % Identifier to switch between input images.
 err_msg  = 'Image not available.';
 
 % Control settings
-visFlag       = false;    %  Set to true to visualize filter responses.
+visFlag       = false;  %  Set to true to visualize filter responses.
 smoothingFlag = true;   %  Set to true to postprocess filter outputs.
+smoothingSig  = 5;      %  Sigma to use for smoothing
 
 %% Read image
 switch image_id
@@ -67,12 +68,12 @@ n = floor(log2(lambdaMax/lambdaMin));
 lambdas = 2.^(0:(n-2)) * lambdaMin;
 
 % Define the set of orientations for the Gaussian envelope.
-dTheta      = 2*pi/8;                  % \\ the step size
+dTheta      = 2*pi/4;                  % \\ the step size
 orientations = 0:dTheta:(pi/2);       
 
 % Define the set of sigmas for the Gaussian envelope. Sigma here defines 
 % the standard deviation, or the spread of the Gaussian. 
-sigmas = [1,2]; 
+sigmas = [1, 2];
 
 % Now you can create the filterbank. We provide you with a MATLAB struct
 % called gaborFilterBank in which we will hold the filters and their
@@ -89,7 +90,7 @@ for ii = 1:length(lambdas)
             lambda = lambdas(ii);
             sigma  = sigmas(jj);            
             theta  = orientations(ll);
-            psi    = 0;
+            psi    = 0.0;
             gamma  = 0.5;
             
             % Create a Gabor filter with the specs above. 
@@ -189,7 +190,7 @@ if smoothingFlag
     for jj = 1:length(featureMags)
         % i)  filter the magnitude response with appropriate Gaussian kernels
         % ii) insert the smoothed image into features(:,:,jj)
-        features(:,:,jj) = imfilter(featureMags{jj}, fspecial('gaussian', 5, 0.5));
+        features(:,:,jj) = imfilter(featureMags{jj}, fspecial('gaussian', 5, smoothingSig));
     end
 else
     % Don't smooth but just insert magnitude images into the matrix
@@ -211,9 +212,8 @@ features = reshape(features, numRows * numCols, []);
 % \\ Hint: see http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing
 %          for more information. \\
 % i)  Implement standardization on matrix called features. 
-features = (features - mean(features));
 % ii) Return the standardized data matrix.
-features = features / std(features);
+features = zscore(features, 0, 2);
 
 % (Optional) Visualize the saliency map using the first principal component 
 % of the features matrix. It will be useful to diagnose possible problems 
