@@ -7,7 +7,7 @@ function [ height_map ] = construct_surface( p, q, path_type )
 %   height_map: the reconstructed surface
 
 if nargin == 2
-    path_type = 'column';
+    path_type = 'average';
 end
 
 [h, w] = size(p);
@@ -25,6 +25,8 @@ switch path_type
             % height_value = previous_height_value + corresponding_q_value
             height_map(x,1) = height_map(x-1,1) + q(x,1);
         end
+        
+        
         
         % for each row
         for x=1:h
@@ -44,15 +46,16 @@ switch path_type
         
         % for each pixel in the upper row of height map
         for y=2:w
-            height_map(1,y) = height_map(1,y-1) + q(1,y);
+            height_map(1,y) = height_map(1,y-1) + p(1,y);
         end
+        
         
         % for each column
         for y=1:w
             % for each element in the column except the top one
             for x=2:h
                 % height value is the previous height + corresp
-                height_map(x,y) = height_map(x-1,y) + p(x,y);
+                height_map(x,y) = height_map(x-1,y) + q(x,y);
             end
         end
 
@@ -64,8 +67,7 @@ switch path_type
         % YOUR CODE GOES HERE
         height_mapc = zeros(h, w);
         height_mapr = zeros(h, w);
-        height_mapcr= zeros(h, w);
-        height_maprr= zeros(h, w);
+
 
         for x= 2:h
             height_mapc(x,1)=height_mapc(x-1,1)+q(x,1);
@@ -76,43 +78,35 @@ switch path_type
                 height_mapc(x,y)=height_mapc(x,y-1)+p(x,y);     
             end
         end
-
-        height_mapr(1,1)=0;
            
+        
+        
+        
+        
         for y= 2:w
             height_mapr(1,y)=height_mapr(1,y-1)+p(1,y);
         end
         
-        for y=1:w
-            for x=2:h
+        
+       
+          for y=1:w
+       for x=2:h
+          
                 height_mapr(x,y)=height_mapr(x-1,y)+q(x,y);
             end
             
         end
 
-        for x=h-1:1
-            height_mapcr(x,1)=height_mapcr(x+1,1)+q(x,1);
-        end
-
-        for x=h:1
-            for y=w-1:1
-                height_mapcr(x,y)=height_mapcr(x,y+1)+p(x,y);
-            end
-        end
-
-        for y=w-1:1
-            height_maprr(1,y)=height_maprr(1,y+1)+q(1,y);
-        end
         
-        for y=w:1
-            for x=h-1:1
-                height_maprr(x,y)=height_maprr(x+1,y)+p(x,y);
-            end
-        end
+        
+        
+        
+        
+        
 
         for x=1:h
             for y=1:w
-                height_map(x,y)=(height_mapr(x,y)-height_mapc(x,y))/2;%-height_maprr(x,y)-height_mapcr(x,y) )/4;
+                height_map(x,y)=(height_mapr(x,y)+height_mapc(x,y))/2;%-height_maprr(x,y)-height_mapcr(x,y) )/4;
             end
         end
 

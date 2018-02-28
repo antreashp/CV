@@ -44,7 +44,8 @@ function [albedo, normals, p, q, SE, height_map] = photometric_stereo_color (ima
     albedoR(isnan(albedoR)) = 0;
     albedoG(isnan(albedoG)) = 0;
     albedoB(isnan(albedoB)) = 0;
-    albedos = (albedoR + albedoG + albedoB) / 3;
+    
+    albedos = cat(3, albedoR, albedoG, albedoB) ;
     
     % we need to set normals to zero as well before calculating with them
     normalR(isnan(normalR)) = 0;
