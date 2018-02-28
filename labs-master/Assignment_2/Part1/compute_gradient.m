@@ -3,8 +3,8 @@ function [Gx, Gy, im_magnitude, im_direction] = compute_gradient(image)
     sobel = [1; 2; 1] * [1, 0, -1];
     
     % calculate Gx and Gy
-    Gx = conv2(image, sobel, 'same');
-    Gy = conv2(image, sobel.', 'same');
+    Gx = imfilter(image, sobel);
+    Gy = imfilter(image, sobel.');
     
     % calculate the magnitude
     im_magnitude = sqrt(Gx.^2 + Gy.^2);

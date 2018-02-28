@@ -18,9 +18,11 @@ subplot(2, 2, 1); imshow(Gx); title('Sobel Gx');
 subplot(2, 2, 2); imshow(Gy); title('Sobel Gy');
 subplot(2, 2, 3); imshow(magnitude); title('Sobel magnitude');
 subplot(2, 2, 4); imshow(direction); title('Sobel direction');
+saveas(gca, 'plots/sobel.png');
 
 % and all different methods
 figure;
 subplot(1, 3, 1); imshow(LoG(:,:,1)); title('Method 1');
 subplot(1, 3, 2); imshow(LoG(:,:,2)); title('Method 2');
 subplot(1, 3, 3); imshow(LoG(:,:,3)); title('Method 3');
+saveas(gca, 'plots/methods-log.png');

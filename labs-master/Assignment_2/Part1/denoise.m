@@ -18,10 +18,9 @@ switch kernel_type
     case 'gaussian'
         % now we use our own function, and we actually use the 1D function
         % instead of the 2D bacuse it simply is faster.
-        kernel = gauss1D(varargin{1}, varargin{2});
+        kernel = gauss2D(varargin{1}, varargin{2});
         
-        % call conv2 with the kernel in the x-direction and subsequently in
-        % y direction
-        imOut = conv2(conv2(image, kernel, 'same'), kernel.', 'same');
+        % call conv2 with the 2d kernel
+        imOut = imfilter(image, kernel.');
 end
 end
