@@ -10,7 +10,7 @@ err_msg  = 'Image not available.';
 
 % Control settings
 visFlag       = false;    %  Set to true to visualize filter responses.
-smoothingFlag = true;   %  Set to true to postprocess filter outputs.
+smoothingFlag = false;   %  Set to true to postprocess filter outputs.
 
 %% Read image
 switch image_id
@@ -199,7 +199,7 @@ if smoothingFlag
         % i)  filter the magnitude response with appropriate Gaussian kernels
         % ii) insert the smoothed image into features(:,:,jj)
     %END_FOR
-    h = fspecial('gaussian',1,7);
+    h = fspecial('gaussian',2,5);
         
     for i=1:length(featureMags)
    
