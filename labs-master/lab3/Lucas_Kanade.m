@@ -18,8 +18,8 @@ for ii=2:nfiles
 %    prev_image=double(prev_image);
 %    
 %    currentimage=double(currentimage);
-disp(size(prev_image));
-disp(size(currentimage));
+% disp(size(prev_image));
+% disp(size(currentimage));
 
    Gz=rgb2gray(prev_image)-rgb2gray(currentimage);
    velocities=find_Ab(rgb2gray(currentimage),Gz,"corners",corx,cory);
@@ -44,7 +44,7 @@ disp(size(currentimage));
    cory=floor(cory+(velocities(:,1).*off));
    
     
-   
+   delete(char(strcat(string(ii)+currentfilename)));
    prev_image=currentimage;
    pause(0.01);  
 end

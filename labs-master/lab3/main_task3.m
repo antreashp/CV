@@ -1,3 +1,4 @@
+price=10000 %how expensive the algorith is (0 is the most expensive number of images is the minimum price)
 %read images ping pong
 imagefiles = dir('D:\Users\Andy\Downloads\Desktop\CV\labs-master\lab3\pingpong\*.jpeg');      
 nfiles = length(imagefiles);
