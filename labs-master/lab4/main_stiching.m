@@ -1,21 +1,24 @@
-run('D:/Users/Andy/Downloads/Desktop/vlfeat-0.9.21/toolbox/vl_setup');
-im1=imread('right.jpg');%rgb2gray(imread('left.jpg'));%imread('boat1.pgm')
-im2=imread('left.jpg');%rgb2gray(imread('right.jpg'));
-if length(size(im1))==2
-im1=im2single(im1);
+% setup vlfeat and load the left and right image
+run('vlfeat-0.9.21/toolbox/vl_setup');
+im1 = imread('right.jpg');%rgb2gray(imread('left.jpg'));%imread('boat1.pgm')
+im2 = imread('left.jpg');%rgb2gray(imread('right.jpg'));
 
-im2=im2single(im2);
-else
-im1=im2single(rgb2gray(im1));
-
-im2=im2single(rgb2gray(im2));
-    
+% convert to grayscale
+if length(size(im1)) ~= 2
+    im1 = rgb2gray(im1);
+    im2 = rgb2gray(im2);  
 end
-[fa,fb,matches]=keypoint_matching(im1,im2);
 
+% convert to single
+im1 = im2single(im1);
+im2 = im2single(im2);
+
+% match and use ransac
+[fa,fb,matches] = keypoint_matching(im1, im2);
 [M, T, ~] = ransac(fa, fb, matches, 15);
 
-[shiftedIm, shifted_w, shifted_h, shift]=stiching(M,T,im1,im2);
+% stitch them together
+[shiftedIm, shifted_w, shifted_h, shift] = stitch(M, T, im1, im2);
 
 % for i=2:4:shifted_h-1
 %     for j=2:4:shifted_w-1
@@ -32,7 +35,6 @@ P(1:2, 1:2) = M';
 P(3, 3) = 1;  
 
 transformed = maketform('affine', P);
-
 matlab_tr_img = imtransform(im1, transformed);
 
 figure(2);
@@ -42,7 +44,6 @@ figure(10);
 imshow(matlab_tr_img);
 figure(11);
 imshow(shiftedIm);
-% 
 
 figure(3);
 subplot(1, 3, 1);
@@ -61,7 +62,7 @@ im4(top_pos:bottom_pos,left_pos:right_pos) = im2;
 subplot(1, 3, 2);
 imshow(im4);
 
-shiftedIm(top_pos:bottom_pos,left_pos:right_pos) = im2;
+shiftedIm(top_pos:bottom_pos, left_pos:right_pos) = im2;
  
 subplot(1, 3, 3);
 imshow(shiftedIm);
