@@ -1,47 +1,65 @@
-function [model] = train_a_class(class)
+function [model] = train_a_class(class,type)
 %TRAIN_A_CLASS Summary of this function goes here
 %   Detailed explanation goes here
 
 dir_path='D:/Users/Andy/Downloads/Desktop/CV/labs-master/FinalProject/Caltech4/ImageData/';
 if class==1
-    aX = matfile('airplanesX.mat');
-aX = aX.airplanesX;
-aX=aX(2:size(aX,1),:,:);
-aY = matfile('airplanesY.mat');
-aY = aY.airplanesY;
+    X = matfile('airplanesX.mat');
+    X = X.airplanesX;
+%     aX=aX(2:size(aX,1),:,:);
+    Y = matfile('airplanesY.mat');
+    Y = Y.airplanesY;
+%     aY=aY(2:size(aY,1),:,:);
+   id = matfile('airplanes_id.mat');
+    id = id.airplanes_id;
+
 elseif class==2
-    aX = matfile('carsX.mat');
-aX = aX.carsX;
-aX=aX(2:size(aX,1),:,:);
-aY = matfile('carsY.mat');
-aY = aY.carsY;
+    X = matfile('carsX.mat');
+X = X.carsX;
+% aX=aX(2:size(aX,1),:,:);
+Y = matfile('carsY.mat');
+Y = Y.carsY;
+% aY=aY(2:size(aY,1),:,:);
+
+   id = matfile('cars_id.mat');
+    id = id.cars_id;
 elseif class==3
-    aX = matfile('facesX.mat');
-aX = aX.facesX;
-aX=aX(2:size(aX,1),:,:);
-aY = matfile('facesY.mat');
-aY = aY.facesY;
+    X = matfile('facesX.mat');
+    X = X.facesX;
+%     aX=aX(2:size(aX,1),:,:);
+    Y = matfile('facesY.mat');
+    Y = Y.facesY;
+% aY=aY(2:size(aY,1),:,:);
+
+   id = matfile('faces_id.mat');
+    id = id.faces_id;
 elseif class==4
-   aX = matfile('motorbikesX.mat');
-aX = aX.motorbikesX;
-aX=aX(2:size(aX,1),:,:);
-aY = matfile('motorbikesY.mat');
-aY = aY.motorbikesY;
+X = matfile('motorbikesX.mat');
+X = X.motorbikesX;
+% aX=aX(2:size(aX,1),:,:);
+Y = matfile('motorbikesY.mat');
+Y = Y.motorbikesY;
+% aY=aY(2:size(aY,1),:,:);
     
+   id = matfile('motorbikes_id.mat');
+    id = id.motorbikes_id;
 end
 
-rp=randperm(size(aX,1));
-aX=aX(rp,:,:);
-aY=aY(rp,:,:);
+% size(aX)
+% size(aY)
 
 
-aX_train=squeeze(aX(1:size(aX,1)/2,:,:));
-aX_validate=squeeze(aX(1+size(aX,1)/2:size(aX,1),:,:));
 
-
-aY_train=aY(1:size(aY,1)/2,:,:);
-aY_validate=aY(1+size(aY,1)/2:size(aY,1),:,:);
-
-model = fitcsvm(aX_train,aY_train,'KernelFunction','rbf','Standardize',true);
+X=squeeze(X);
+% aY=squeeze(aY);
+if type=="matlab"
+c = cvpartition(800,'KFold',40);
+opts = struct('Optimizer','bayesopt','ShowPlots',true,'CVPartition',c,'AcquisitionFunctionName','expected-improvement-plus');
+model = fitcsvm(X,Y,'OptimizeHyperparameters','auto','HyperparameterOptimizationOptions',opts);
+else
+    
+ best = train(double(Y), sparse(X),[' -C  -s 0 -v 10 '  ] );
+ model = train(double(Y),sparse(X), [' -s 0  -c ' num2str(best(1)) ] );
+end 
 end
 

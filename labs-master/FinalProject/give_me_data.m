@@ -59,10 +59,10 @@ vdf=train_data(1+(n_train*2):(2*n_train)+half_off);
 vdm=train_data(1+(n_train*3):(3*n_train)+half_off);
 
 
-da=train_data(half_off:n_train-1);
-dc=train_data((n_train*1)+half_off:(n_train*2)-1);
-df=train_data((n_train*2)+half_off:(n_train*3)-1);
-dm=train_data((n_train*3)+half_off:(n_train*4)-1);
+da=train_data(half_off+1:n_train);
+dc=train_data((n_train*1)+half_off+1:(n_train*2));
+df=train_data((n_train*2)+half_off+1:(n_train*3));
+dm=train_data((n_train*3)+half_off+1:(n_train*4));
 
 
 
